@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pronoute — Collège Jean Helon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#17253F;
+    --blue:#2F5FA0;
+    --blue-light:#EAF0F9;
+    --gold:#C89B3C;
+    --paper:#EEF1F6;
+    --card:#FFFFFF;
+    --ink:#1B2230;
+    --ink-soft:#5B6472;
+    --line:#DDE2EA;
+    --success:#2E7D4F;
+    --success-bg:#E7F4EC;
+    --danger:#B23A34;
+    --danger-bg:#FBEAE9;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'Public Sans',sans-serif;}
+  h1,h2,h3{font-family:'Fraunces',serif;margin:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  button{font-family:'Public Sans',sans-serif;cursor:pointer;}
+  input,select,textarea{font-family:'Public Sans',sans-serif;}
+
+  /* ---------- Crest ---------- */
+  .crest{
+    width:46px;height:46px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #2c4d84, var(--navy) 70%);
+    border:2px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--gold);font-family:'Fraunces',serif;font-weight:700;font-size:15px;
+    flex-shrink:0;
+    box-shadow:0 0 0 3px rgba(200,155,60,0.12);
+  }
+
+  /* ---------- Login ---------- */
+  .login-wrap{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #1d3155 0%, transparent 60%),
+      radial-gradient(1000px 500px at 110% 110%, #1d3155 0%, transparent 55%),
+      var(--navy);
+    padding:24px;
+  }
+  .login-card{
+    background:var(--card);width:100%;max-width:400px;border-radius:14px;
+    padding:38px 34px 30px;box-shadow:0 30px 60px -20px rgba(0,0,0,0.5);
+    position:relative;
+  }
+  .login-head{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:26px;text-align:center;}
+  .login-head .crest{width:60px;height:60px;font-size:19px;}
+  .login-head h1{font-size:22px;letter-spacing:0.2px;color:var(--navy);}
+  .login-head p{margin:2px 0 0;color:var(--ink-soft);font-size:13px;letter-spacing:0.4px;text-transform:uppercase;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;letter-spacing:0.2px;}
+  .field input{
+    width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:8px;
+    font-size:14.5px;background:#FAFBFD;transition:border-color .15s;
+  }
+  .field input:focus{outline:none;border-color:var(--blue);background:#fff;}
+  .btn-primary{
+    width:100%;padding:12px;border:none;border-radius:8px;background:var(--navy);color:#fff;
+    font-weight:600;font-size:14.5px;letter-spacing:0.2px;transition:background .15s;
+  }
+  .btn-primary:hover{background:#233A61;}
+  .login-error{
+    background:var(--danger-bg);color:var(--danger);border-radius:8px;padding:10px 12px;
+    font-size:13px;margin-bottom:16px;display:none;
+  }
+  .login-foot{margin-top:20px;text-align:center;font-size:12px;color:var(--ink-soft);}
+
+  /* ---------- App shell ---------- */
+  .app{display:flex;min-height:100vh;}
+  .sidebar{
+    width:230px;background:var(--navy);color:#fff;flex-shrink:0;
+    display:flex;flex-direction:column;padding:20px 14px;position:sticky;top:0;height:100vh;
+  }
+  .sb-head{display:flex;align-items:center;gap:10px;padding:6px 8px 20px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:16px;}
+  .sb-head .crest{width:38px;height:38px;font-size:13px;}
+  .sb-head-text{line-height:1.2;}
+  .sb-head-text b{font-family:'Fraunces',serif;font-size:15.5px;display:block;}
+  .sb-head-text span{font-size:10.5px;color:#B9C3D6;text-transform:uppercase;letter-spacing:0.5px;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;
+    color:#CBD5E5;font-size:13.5px;font-weight:500;cursor:pointer;margin-bottom:2px;
+    border:none;background:transparent;width:100%;text-align:left;
+  }
+  .nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;}
+  .nav-item.active{background:var(--blue);color:#fff;}
+  .sb-foot{margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,0.1);}
+  .sb-user{padding:8px;border-radius:8px;background:rgba(255,255,255,0.05);margin-bottom:8px;}
+  .sb-user b{font-size:13px;display:block;}
+  .sb-user span{font-size:11px;color:#B9C3D6;text-transform:uppercase;letter-spacing:0.4px;}
+  .btn-logout{
+    width:100%;padding:9px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);
+    background:transparent;color:#CBD5E5;font-size:12.5px;font-weight:500;
+  }
+  .btn-logout:hover{background:rgba(255,255,255,0.06);color:#fff;}
+
+  .main{flex:1;padding:32px 40px;max-width:1100px;}
+  .page-head{margin-bottom:26px;}
+  .eyebrow{font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:6px;}
+  .page-head h2{font-size:26px;color:var(--navy);}
+  .page-sub{color:var(--ink-soft);font-size:14px;margin-top:6px;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;margin-bottom:20px;}
+  .card h3{font-size:16px;color:var(--navy);margin-bottom:14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  @media (max-width:640px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:left;color:var(--ink-soft);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:0.4px;padding:8px 10px;border-bottom:2px solid var(--line);}
+  td{padding:10px 10px;border-bottom:1px solid var(--line);}
+  tr:last-child td{border-bottom:none;}
+  .tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.3px;}
+  .tag-admin{background:#F3E8D9;color:#8A6414;}
+  .tag-prof{background:var(--blue-light);color:var(--blue);}
+  .tag-eleve{background:var(--success-bg);color:var(--success);}
+  .tag-personnel{background:#EFE9F5;color:#6C4A9C;}
+  .tag-infirmier{background:#FCE4E9;color:#A03A5C;}
+  .tag-surveillant{background:#E4F1F8;color:#1E6F8E;}
+  .vie-dot.colle{background:#6C4A9C;}
+  .statut-badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+  .statut-badge.aeffectuer{background:#FBEAE9;color:var(--danger);}
+  .statut-badge.effectuee{background:var(--success-bg);color:var(--success);}
+
+  .btn-sm{padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:#fff;font-size:12.5px;font-weight:600;color:var(--ink);}
+  .btn-sm:hover{background:#F5F6F8;}
+  .btn-sm.danger{color:var(--danger);border-color:#EFC9C6;}
+  .btn-sm.danger:hover{background:var(--danger-bg);}
+  .btn-add{padding:9px 16px;border-radius:8px;border:none;background:var(--blue);color:#fff;font-weight:600;font-size:13px;}
+  .btn-add:hover{background:#254B85;}
+
+  .field-inline{display:flex;flex-direction:column;gap:5px;}
+  .field-inline label{font-size:12px;font-weight:600;color:var(--ink-soft);}
+  .field-inline input, .field-inline select, .field-inline textarea{
+    padding:9px 11px;border:1.5px solid var(--line);border-radius:7px;font-size:13.5px;background:#FAFBFD;
+  }
+  .field-inline input:focus, .field-inline select:focus, .field-inline textarea:focus{outline:none;border-color:var(--blue);background:#fff;}
+  .form-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px;}
+  .form-row .field-inline{flex:1;min-width:130px;}
+
+  .empty{color:var(--ink-soft);font-size:13.5px;padding:18px;text-align:center;border:1.5px dashed var(--line);border-radius:8px;}
+
+  .day-col{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;min-height:60px;}
+  .day-title{background:var(--navy);color:#fff;font-size:12px;font-weight:600;text-align:center;padding:8px;text-transform:uppercase;letter-spacing:0.5px;}
+  .slot{padding:9px 10px;border-bottom:1px solid var(--line);font-size:12.5px;}
+  .slot:last-child{border-bottom:none;}
+  .slot b{display:block;color:var(--navy);font-size:12.5px;}
+  .slot .heure{font-family:'IBM Plex Mono',monospace;color:var(--blue);font-size:11px;font-weight:600;}
+  .slot .salle{color:var(--ink-soft);font-size:11px;}
+  .slot .del{float:right;color:var(--danger);cursor:pointer;font-size:11px;}
+  .edt-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  @media (max-width:900px){.edt-grid{grid-template-columns:1fr;}}
+
+  .devoir-item{border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-bottom:10px;background:#fff;}
+  .devoir-item .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+  .devoir-item .matiere{font-weight:700;color:var(--navy);font-size:14px;}
+  .devoir-item .date{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--blue);background:var(--blue-light);padding:2px 8px;border-radius:5px;}
+  .devoir-item p{margin:0;font-size:13.5px;color:var(--ink);line-height:1.5;}
+  .devoir-item .meta{margin-top:8px;font-size:11.5px;color:var(--ink-soft);}
+
+  .vie-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .vie-item:last-child{border-bottom:none;}
+  .vie-dot{width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+  .vie-dot.absence{background:var(--danger);}
+  .vie-dot.retard{background:var(--gold);}
+  .vie-dot.sanction{background:#8A2E2A;}
+  .vie-dot.observation{background:var(--blue);}
+  .vie-item .desc{font-size:13.5px;}
+  .vie-item .meta{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+
+  .toast{
+    position:fixed;bottom:22px;right:22px;background:var(--navy);color:#fff;padding:12px 18px;
+    border-radius:8px;font-size:13.5px;box-shadow:0 10px 30px rgba(0,0,0,0.25);opacity:0;
+    transform:translateY(10px);transition:all .25s;pointer-events:none;z-index:99;
+  }
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px;}
+  @media (max-width:800px){.stat-row{grid-template-columns:1fr 1fr;}}
+  .stat-card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;}
+  .stat-card .num{font-family:'Fraunces',serif;font-size:28px;color:var(--navy);}
+  .stat-card .lbl{font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.4px;margin-top:2px;}
+
+  ::selection{background:var(--gold);color:#1B2230;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const JOURS = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi"];
+const ADMIN = { id:"admin-0", identifiant:"helon.fonda", password:"NVQ5006uTkctjLWj", role:"admin", nom:"Administration", prenom:"Collège", classe:null, matiere:null };
+
+let state = {
+  currentUser: null,
+  users: [],
+  classes: [],
+  edt: {},
+  devoirs: [],
+  vie: [],
+  colles: [],
+  infirmerie: [],
+  page: "accueil",
+  loaded: false
+};
+
+/* ---------------- Storage ---------------- */
+async function loadKey(key, fallback){
+  try{
+    const r = await window.storage.get(key, true);
+    return r ? JSON.parse(r.value) : fallback;
+  }catch(e){ return fallback; }
+}
+async function saveKey(key, value){
+  try{ await window.storage.set(key, JSON.stringify(value), true); }
+  catch(e){ showToast("Erreur de sauvegarde — réessaie."); }
+}
+async function loadAll(){
+  state.users = await loadKey("pronoute:users", []);
+  state.classes = await loadKey("pronoute:classes", ["6e1","5e1","4e1","3e1"]);
+  state.edt = await loadKey("pronoute:edt", {});
+  state.devoirs = await loadKey("pronoute:devoirs", []);
+  state.vie = await loadKey("pronoute:vie", []);
+  state.colles = await loadKey("pronoute:colles", []);
+  state.infirmerie = await loadKey("pronoute:infirmerie", []);
+  state.loaded = true;
+}
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove("show"), 2400);
+}
+
+/* ---------------- Auth ---------------- */
+function tryLogin(identifiant, password){
+  if(identifiant === ADMIN.identifiant && password === ADMIN.password){
+    return ADMIN;
+  }
+  return state.users.find(u => u.identifiant === identifiant && u.password === password) || null;
+}
+
+/* ---------------- Render root ---------------- */
+function render(){
+  if(!state.loaded){
+    document.getElementById("app").innerHTML = `<div class="login-wrap"><p style="color:#fff">Chargement…</p></div>`;
+    return;
+  }
+  if(!state.currentUser){
+    renderLogin();
+  } else {
+    renderApp();
+  }
+}
+
+/* ---------------- Login screen ---------------- */
+function renderLogin(){
+  document.getElementById("app").innerHTML = `
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-head">
+        <div class="crest">CJH</div>
+        <h1>Pronoute</h1>
+        <p>Collège Jean Helon</p>
+      </div>
+      <div class="login-error" id="loginError">Identifiant ou mot de passe incorrect.</div>
+      <div class="field">
+        <label for="idInput">Identifiant</label>
+        <input type="text" id="idInput" autocomplete="username" placeholder="prenom.nom">
+      </div>
+      <div class="field">
+        <label for="pwInput">Mot de passe</label>
+        <input type="password" id="pwInput" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" id="loginBtn">Se connecter</button>
+      <div class="login-foot">Accès réservé aux élèves, professeurs et personnel du collège Jean Helon.</div>
+    </div>
+  </div>`;
+
+  const doLogin = ()=>{
+    const idV = document.getElementById("idInput").value.trim();
+    const pwV = document.getElementById("pwInput").value;
+    const user = tryLogin(idV, pwV);
+    if(user){
+      state.currentUser = user;
+      state.page = "accueil";
+      render();
+    } else {
+      document.getElementById("loginError").style.display = "block";
+    }
+  };
+  document.getElementById("loginBtn").addEventListener("click", doLogin);
+  document.getElementById("pwInput").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
+  document.getElementById("idInput").addEventListener("keydown", e=>{ if(e.key==="Enter") doLogin(); });
+}
+
+/* ---------------- App shell ---------------- */
+function navItemsFor(role){
+  const base = [{id:"accueil", label:"Accueil"}];
+  if(role==="admin") base.push({id:"comptes", label:"Comptes"}, {id:"classes", label:"Classes"});
+  if(["admin","prof","eleve","personnel"].includes(role)) base.push({id:"edt", label:"Emploi du temps"});
+  if(["admin","prof","eleve","personnel"].includes(role)) base.push({id:"devoirs", label:"Devoirs"});
+  if(["admin","prof","eleve","surveillant"].includes(role)) base.push({id:"vie", label:"Vie scolaire"});
+  if(["admin","surveillant","eleve","prof"].includes(role)) base.push({id:"colles", label:"Heures de colle"});
+  if(["admin","infirmier","eleve"].includes(role)) base.push({id:"infirmerie", label:"Infirmerie"});
+  return base;
+}
+const roleLabel = {
+  admin:"Administration", prof:"Professeur", eleve:"Élève", personnel:"Personnel",
+  infirmier:"Infirmier(ère)", surveillant:"Surveillant(e)"
+};
+
+function renderApp(){
+  const u = state.currentUser;
+  const items = navItemsFor(u.role);
+  document.getElementById("app").innerHTML = `
+  <div class="app">
+    <div class="sidebar">
+      <div class="sb-head">
+        <div class="crest">CJH</div>
+        <div class="sb-head-text"><b>Pronoute</b><span>Jean Helon</span></div>
+      </div>
+      <div id="navList"></div>
+      <div class="sb-foot">
+        <div class="sb-user">
+          <b>${u.prenom} ${u.nom}</b>
+          <span>${roleLabel[u.role]}${u.classe? " · "+u.classe : ""}</span>
+        </div>
+        <button class="btn-logout" id="logoutBtn">Se déconnecter</button>
+      </div>
+    </div>
+    <div class="main" id="mainArea"></div>
+  </div>`;
+
+  const navList = document.getElementById("navList");
+  items.forEach(it=>{
+    const btn = document.createElement("button");
+    btn.className = "nav-item" + (state.page===it.id ? " active":"");
+    btn.textContent = it.label;
+    btn.addEventListener("click", ()=>{ state.page = it.id; render(); });
+    navList.appendChild(btn);
+  });
+  document.getElementById("logoutBtn").addEventListener("click", ()=>{
+    state.currentUser = null; render();
+  });
+
+  renderPage();
+}
+
+function renderPage(){
+  const main = document.getElementById("mainArea");
+  const u = state.currentUser;
+  if(state.page==="accueil") return renderAccueil(main, u);
+  if(state.page==="comptes" && u.role==="admin") return renderComptes(main);
+  if(state.page==="classes" && u.role==="admin") return renderClasses(main);
+  if(state.page==="edt") return renderEDT(main, u);
+  if(state.page==="devoirs") return renderDevoirs(main, u);
+  if(state.page==="vie" && ["admin","prof","eleve","surveillant"].includes(u.role)) return renderVie(main, u);
+  if(state.page==="colles" && ["admin","surveillant","eleve","prof"].includes(u.role)) return renderColles(main, u);
+  if(state.page==="infirmerie" && ["admin","infirmier","eleve"].includes(u.role)) return renderInfirmerie(main, u);
+  main.innerHTML = `<div class="empty">Page introuvable.</div>`;
+}
+
+/* ---------------- Accueil ---------------- */
+function renderAccueil(main, u){
+  const today = new Date().toLocaleDateString("fr-FR", { weekday:"long", day:"numeric", month:"long" });
+  let stats = "";
+  if(u.role==="admin"){
+    stats = `
+    <div class="stat-row">
+      <div class="stat-card"><div class="num">${state.users.length}</div><div class="lbl">Comptes créés</div></div>
+      <div class="stat-card"><div class="num">${state.classes.length}</div><div class="lbl">Classes</div></div>
+      <div class="stat-card"><div class="num">${state.devoirs.length}</div><div class="lbl">Devoirs publiés</div></div>
+      <div class="stat-card"><div class="num">${state.vie.length}</div><div class="lbl">Événements vie scolaire</div></div>
+      <div class="stat-card"><div class="num">${state.colles.length}</div><div class="lbl">Heures de colle</div></div>
+      <div class="stat-card"><div class="num">${state.infirmerie.length}</div><div class="lbl">Passages infirmerie</div></div>
+    </div>`;
+  }
+  main.innerHTML = `
+    <div class="page-head">
+      <div class="eyebrow">${today}</div>
+      <h2>Bonjour, ${u.prenom} ${u.nom}</h2>
+      <div class="page-sub">Bienvenue sur l'espace ${roleLabel[u.role].toLowerCase()} du collège Jean Helon.</div>
+    </div>
+    ${stats}
+    <div class="card">
+      <h3>Derniers devoirs</h3>
+      <div id="accueilDevoirs"></div>
+    </div>
+    <div class="card">
+      <h3>Dernières informations — vie scolaire</h3>
+      <div id="accueilVie"></div>
+    </div>
+  `;
+  const dHost = document.getElementById("accueilDevoirs");
+  let devoirsVisibles = state.devoirs;
+  if(u.role==="eleve") devoirsVisibles = devoirsVisibles.filter(d=>d.classe===u.classe);
+  if(u.role==="prof") devoirsVisibles = devoirsVisibles.filter(d=>d.prof===(u.prenom+" "+u.nom));
+  devoirsVisibles = [...devoirsVisibles].sort((a,b)=> (a.pourDate||"").localeCompare(b.pourDate||"")).slice(0,4);
+  dHost.innerHTML = devoirsVisibles.length ? devoirsVisibles.map(devoirCardHTML).join("") : `<div class="empty">Aucun devoir pour le moment.</div>`;
+
+  const vHost = document.getElementById("accueilVie");
+  let vieVisible = state.vie;
+  if(u.role==="eleve") vieVisible = vieVisible.filter(v=>v.eleveId===u.id);
+  vieVisible = [...vieVisible].sort((a,b)=> (b.date||"").localeCompare(a.date||"")).slice(0,4);
+  vHost.innerHTML = vieVisible.length ? vieVisible.map(vieItemHTML).join("") : `<div class="empty">Aucun événement récent.</div>`;
+}
+
+/* ---------------- Comptes (admin) ---------------- */
+function renderComptes(main){
+  main.innerHTML = `
+    <div class="page-head">
+      <div class="eyebrow">Administration</div>
+      <h2>Comptes</h2>
+      <div class="page-sub">Crée et gère les comptes des élèves, professeurs et personnel.</div>
+    </div>
+    <div class="card">
+      <h3>Ajouter un compte</h3>
+      <div class="form-row">
+        <div class="field-inline"><label>Prénom</label><input id="fPrenom"></div>
+        <div class="field-inline"><label>Nom</label><input id="fNom"></div>
+        <div class="field-inline">
+          <label>Rôle</label>
+          <select id="fRole">
+            <option value="eleve">Élève</option>
+            <option value="prof">Professeur</option>
+            <option value="surveillant">Surveillant(e)</option>
+            <option value="infirmier">Infirmier(ère)</option>
+            <option value="personnel">Personnel</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-inline" id="fClasseWrap"><label>Classe</label>
+          <select id="fClasse">${state.classes.map(c=>`<option value="${c}">${c}</option>`).join("")}</select>
+        </div>
+        <div class="field-inline" id="fMatiereWrap" style="display:none"><label>Matière</label><input id="fMatiere" placeholder="Ex : Mathématiques"></div>
+        <div class="field-inline"><label>Identifiant</label><input id="fIdentifiant" placeholder="prenom.nom"></div>
+        <div class="field-inline"><label>Mot de passe</label><input id="fPassword" placeholder="Mot de passe"></div>
+      </div>
+      <button class="btn-add" id="addUserBtn">Créer le compte</button>
+    </div>
+    <div class="card">
+      <h3>Comptes existants (${state.users.length + 1})</h3>
+      <table>
+        <thead><tr><th>Nom</th><th>Rôle</th><th>Classe / Matière</th><th>Identifiant</th><th></th></tr></thead>
+        <tbody id="usersTbody"></tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById("fRole").addEventListener("change", e=>{
+    const isEleve = e.target.value === "eleve";
+    const isProf = e.target.value === "prof";
+    document.getElementById("fClasseWrap").style.display = isEleve ? "flex":"none";
+    document.getElementById("fMatiereWrap").style.display = isProf ? "flex":"none";
+  });
+  document.getElementById("fMatiereWrap").querySelector("label").textContent = "Matière";
+  document.getElementById("fClasseWrap").style.display = "flex";
+
+  document.getElementById("addUserBtn").addEventListener("click", async ()=>{
+    const prenom = document.getElementById("fPrenom").value.trim();
+    const nom = document.getElementById("fNom").value.trim();
+    const role = document.getElementById("fRole").value;
+    const identifiant = document.getElementById("fIdentifiant").value.trim();
+    const password = document.getElementById("fPassword").value;
+    if(!prenom || !nom || !identifiant || !password){ showToast("Remplis tous les champs obligatoires."); return; }
+    if(identifiant === ADMIN.identifiant || state.users.some(u=>u.identifiant===identifiant)){
+      showToast("Cet identifiant existe déjà."); return;
+    }
+    const newUser = {
+      id: uid(), prenom, nom, role, identifiant, password,
+      classe: role==="eleve" ? document.getElementById("fClasse").value : null,
+      matiere: role==="prof" ? document.getElementById("fMatiere").value.trim() : null
+    };
+    state.users.push(newUser);
+    await saveKey("pronoute:users", state.users);
+    showToast("Compte créé pour " + prenom + " " + nom + ".");
+    renderComptes(main);
+  });
+
+  const tbody = document.getElementById("usersTbody");
+  const rows = [ADMIN, ...state.users];
+  tbody.innerHTML = rows.map(u=>`
+    <tr>
+      <td><b>${u.prenom} ${u.nom}</b></td>
+      <td><span class="tag tag-${u.role}">${roleLabel[u.role]}</span></td>
+      <td>${u.classe ? u.classe : (u.matiere ? u.matiere : "—")}</td>
+      <td class="mono">${u.identifiant}</td>
+      <td>${u.id!=="admin-0" ? `<button class="btn-sm danger" data-id="${u.id}">Supprimer</button>` : ""}</td>
+    </tr>
+  `).join("");
+  tbody.querySelectorAll("button[data-id]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      state.users = state.users.filter(u=>u.id!==btn.dataset.id);
+      await saveKey("pronoute:users", state.users);
+      showToast("Compte supprimé.");
+      renderComptes(main);
+    });
+  });
+}
+
+/* ---------------- Classes (admin) ---------------- */
+function renderClasses(main){
+  main.innerHTML = `
+    <div class="page-head">
+      <div class="eyebrow">Administration</div>
+      <h2>Classes</h2>
+      <div class="page-sub">Gère la liste des classes du collège.</div>
+    </div>
+    <div class="card">
+      <div class="form-row">
+        <div class="field-inline"><label>Nouvelle classe</label><input id="fNewClasse" placeholder="Ex : 5e2"></div>
+        <button class="btn-add" id="addClasseBtn">Ajouter</button>
+      </div>
+      <table>
+        <thead><tr><th>Classe</th><th>Élèves</th><th></th></tr></thead>
+        <tbody id="classesTbody"></tbody>
+      </table>
+    </div>
+  `;
+  document.getElementById("addClasseBtn").addEventListener("click", async ()=>{
+    const v = document.getElementById("fNewClasse").value.trim();
+    if(!v){ return; }
+    if(state.classes.includes(v)){ showToast("Cette classe existe déjà."); return; }
+    state.classes.push(v);
+    await saveKey("pronoute:classes", state.classes);
+    renderClasses(main);
+  });
+  const tbody = document.getElementById("classesTbody");
+  tbody.innerHTML = state.classes.length ? state.classes.map(c=>{
+    const count = state.users.filter(u=>u.role==="eleve" && u.classe===c).length;
+    return `<tr><td><b>${c}</b></td><td>${count}</td><td><button class="btn-sm danger" data-c="${c}">Supprimer</button></td></tr>`;
+  }).join("") : `<tr><td colspan="3"><div class="empty">Aucune classe pour le moment.</div></td></tr>`;
+  tbody.querySelectorAll("button[data-c]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      state.classes = state.classes.filter(c=>c!==btn.dataset.c);
+      await saveKey("pronoute:classes", state.classes);
+      renderClasses(main);
+    });
+  });
+}
+
+/* ---------------- Emploi du temps ---------------- */
+function renderEDT(main, u){
+  const canEdit = u.role==="admin";
+  let classeOptions = state.classes;
+  let selectedClasse = u.role==="eleve" ? u.classe : (window._edtSelected || state.classes[0]);
+  main.innerHTML = `
+    <div class="page-head">
+      <div class="eyebrow">Emploi du temps</div>
+      <h2>${u.role==="eleve" ? "Ma classe : "+ (u.classe||"—") : "Consulter par classe"}</h2>
+      <div class="page-sub">Semaine type — cours du lundi au vendredi.</div>
+    </div>
+    ${u.role!=="eleve" ? `
+    <div class="card" style="padding:14px 18px;">
+      <div class="field-inline" style="max-width:220px;">
+        <label>Classe</label>
+        <select id="edtClasseSelect">${classeOptions.map(c=>`<option value="${c}" ${c===selectedClasse?"selected":""}>${c}</option>`).join("")}</select>
+      </div>
+    </div>` : ""}
+    ${canEdit ? `
+    <div class="card">
+      <h3>Ajouter un cours</h3>
+      <div class="form-row">
+        <div class="field-inline"><label>Jour</label>
+          <select id="eJour">${JOURS.map(j=>`<option>${j}</option>`).join("")}</select>
+        </div>
+        <div class="field-inline"><label>Début</label><input type="time" id="eDebut" value="08:00"></div>
+        <div class="field-inline"><label>Fin</label><input type="time" id="eFin" value="09:00"></div>
+        <div class="field-inline"><label>Matière</label><input id="eMatiere" placeholder="Ex : Français"></div>
+        <div class="field-inline"><label>Professeur</label><input id="eProf" placeholder="Ex : M. Dupont"></div>
+        <div class="field-inline"><label>Salle</label><input id="eSalle" placeholder="Ex : B12"></div>
+      </div>
+      <button class="btn-add" id="addSlotBtn">Ajouter au planning</button>
+    </div>` : ""}
+    <div class="edt-grid" id="edtGrid"></div>
+  `;
+
+  if(u.role!=="eleve"){
+    document.getElementById("edtClasseSelect").addEventListener("change", e=>{
+      window._edtSelected = e.target.value;
+      renderEDT(main, u);
+    });
+  }
+
+  if(canEdit){
+    document.getElementById("addSlotBtn").addEventListener("click", async ()=>{
+      const classe = selectedClasse;
+      if(!classe){ showToast("Crée d'abord une classe."); return; }
+      const jour = document.getElementById("eJour").value;
+      const debut = document.getElementById("eDebut").value;
+      const fin = document.getElementById("eFin").value;
+      const matiere = document.getElementById("eMatiere").value.trim();
+      const prof = document.getElementById("eProf").value.trim();
+      const salle = document.getElementById("eSalle").value.trim();
+      if(!matiere){ showToast("Indique une matière."); return; }
+      if(!state.edt[classe]) state.edt[classe] = [];
+      state.edt[classe].push({ id: uid(), jour, debut, fin, matiere, prof, salle });
+      await saveKey("pronoute:edt", state.edt);
+      showToast("Cours ajouté.");
+      renderEDT(main, u);
+    });
+  }
+
+  const grid = document.getElementById("edtGrid");
+  const slotsForClasse = (state.edt[selectedClasse] || []);
+  grid.innerHTML = JOURS.map(jour=>{
+    const daySlots = slotsForClasse.filter(s=>s.jour===jour).sort((a,b)=>a.debut.localeCompare(b.debut));
+    return `<div class="day-col">
+      <div class="day-title">${jour}</div>
+      ${daySlots.length ? daySlots.map(s=>`
+        <div class="slot">
+          ${canEdit ? `<span class="del" data-id="${s.id}">✕</span>` : ""}
+          <span class="heure">${s.debut} – ${s.fin}</span>
+          <b>${s.matiere}</b>
+          <span class="salle">${s.prof ? s.prof+" · " : ""}${s.salle||""}</span>
+        </div>
+      `).join("") : `<div class="slot" style="color:var(--ink-soft);">Aucun cours</div>`}
+    </div>`;
+  }).join("");
+
+  if(canEdit){
+    grid.querySelectorAll(".del").forEach(el=>{
+      el.addEventListener("click", async ()=>{
+        state.edt[selectedClasse] = state.edt[selectedClasse].filter(s=>s.id!==el.dataset.id);
+        await saveKey("pronoute:edt", state.edt);
+        renderEDT(main, u);
+      });
+    });
+  }
+}
+
+/* ---------------- Devoirs ---------------- */
+function devoirCardHTML(d){
+  return `<div class="devoir-item">
+    <div class="top"><span class="matiere">${d.matiere}</span><span class="date">Pour le ${d.pourDate || "—"}</span></div>
+    <p>${d.description}</p>
+    <div class="meta">${d.classe} · ajouté par ${d.prof || "—"}</div>
+  </div>`;
+}
+function renderDevoirs(main, u){
+  const canAdd = u.role==="admin" || u.role==="prof";
+  main.innerHTML = `
+    <div class="page-head">
+      <div class="eyebrow">Travail à faire</div>
+      <h2>Devoirs</h2>
+      <div class="page-sub">${u.role==="eleve" ? "Devoirs de ta classe" : "Tous les devoirs publiés"}</div>
+    </div>
+    ${canAdd ? `
+    <div class="card">
+      <h3>Publier un devoir</h3>
+      <div class="form-row">
+        <div class="field-inline"><label>Classe</label>
+          <select id="dClasse">${state.classes.map(c=>`<option value="${c}">${c}</option>`).join("")}</select>
+        </div>
+        <div class="field-inline"><label>Matière</label><input id="dMatiere" placeholder="Ex : Histoire-Géo" value="${u.role==="prof" ? (u.matiere||"") : ""}"></div>
+        <div class="field-inline"><label>À faire pour le</label><input type="date" id="dDate"></div>
+      </div>
+      <div class="field-inline" style="margin-bottom:14px;"><label>Description</label><textarea id="dDesc" rows="3" placeholder="Exercices, page du livre, révisions…"></textarea></div>
+      <button class="btn-add" id="addDevoirBtn">Publier</button>
+    </div>` : ""}
+    <div id="devoirsList"></div>
+  `;
+
+  if(canAdd){
+    document.getElementById("addDevoirBtn").addEventListener("click", async ()=>{
+      const classe = document.getElementById("dClasse").value;
+      const matiere = document.getElementById("dMatiere").value.trim();
+      const pourDate = document.getElementById("dDate").value;
+      const description = document.getElementById("dDesc").value.trim();
+      if(!matiere || !description){ showToast("Remplis la matière et la description."); return; }
+      state.devoirs.push({
+        id: uid(), classe, matiere, pourDate, description,
+        prof: u.prenom+" "+u.nom, publieLe: new Date().toISOString().slice(0,10)
+      });
+      await saveKey("pronoute:devoirs", state.devoirs);
+      showToast("Devoir publié.");
+      renderDevoirs(main, u);
+    });
+  }
+
+  let list = [...state.devoirs];
+  if(u.role==="eleve") list = list.filter(d=>d.classe===u.classe);
+  list.sort((a,b)=> (a.pourDate||"").localeCompare(b.pourDate||""));
+  document.getElementById("devoirsList").innerHTML = list.length ? list.map(devoirCardHTML).join("") : `<div class="empty">Aucun devoir publié pour le moment.</div>`;
+}
+
+/* ---------------- Vie scolaire ---------------- */
+function vieItemHTML(v){
+  const eleve = state.users.find(u=>u.id===v.eleveId);
+  const nom = eleve ? eleve.prenom+" "+eleve.nom : "Élève";
+  const typeLabel = { absence:"Absence", retard:"Retard", sanction:"Sanction", observation:"Observation" }[v.type] || v.type;
+  return `<div class="vie-item">
+    <div class="vie-dot ${v.type}"></div>
+    <div>
+      <div class="desc"><b>${typeLabel}</b> — ${nom} : ${v.description}</div>
+      <div class="meta">${v.date || ""} · signalé par ${v.par || "—"}</div>
+    </div>
+  </div>`;
+}
+function renderVie(main, u){
+  const canAdd = u.role==="admin" || u.role==="prof";
+  const eleves = state.users.filter(x=>x.role==="eleve");
+  main.innerHTML = `
+    <div class="page-head">
+      <div class="eyebrow">Suivi</div>
+      <h2>Vie scolaire</h2>
+      <div class="page-sub">${u.role==="eleve" ? "Ton suivi personnel" : "Absences, retards, sanctions et observations"}</div>
+    </div>
+    ${canAdd ? `
+    <div class="card">
+      <h3>Ajouter un événement</h3>
+      <div class="form-row">
+        <div class="field-inline"><label>Élève</label>
+          <select id="vEleve">${eleves.map(e=>`<option value="${e.id}">${e.prenom} ${e.nom} (${e.classe||""})</option>`).join("")}</select>
+        </div>
+        <div class="field-inline"><label>Type</label>
+          <select id="vType">
+            <option value="absence">Absence</option>
+            <option value="retard">Retard</option>
+            <option value="sanction">Sanction</option>
+            <option value="observation">Observation</option>
+          </select>
+        </div>
+        <div class="field-inline"><label>Date</label><input type="date" id="vDate"></div>
+      </div>
+      <div class="field-inline" style="margin-bottom:14px;"><label>Description</label><input id="vDesc" placeholder="Ex : Absence non justifiée le matin"></div>
+      <button class="btn-add" id="addVieBtn">Enregistrer</button>
+    </div>` : ""}
+    <div class="card"><div id="vieList"></div></div>
+  `;
+
+  if(!eleves.length && canAdd){
+    document.getElementById("vEleve").innerHTML = `<option>Aucun élève créé</option>`;
+  }
+
+  if(canAdd){
+    document.getElementById("addVieBtn").addEventListener("click", async ()=>{
+      if(!eleves.length){ showToast("Crée d'abord un compte élève."); return; }
+      const eleveId = document.getElementById("vEleve").value;
+      const type = document.getElementById("vType").value;
+      const date = document.getElementById("vDate").value;
+      const description = document.getElementById("vDesc").value.trim();
+      if(!description){ showToast("Ajoute une description."); return; }
+      state.vie.push({ id: uid(), eleveId, type, date, description, par: u.prenom+" "+u.nom });
+      await saveKey("pronoute:vie", state.vie);
+      showToast("Événement enregistré.");
+      renderVie(main, u);
+    });
+  }
+
+  let list = [...state.vie];
+  if(u.role==="eleve") list = list.filter(v=>v.eleveId===u.id);
+  list.sort((a,b)=> (b.date||"").localeCompare(a.date||""));
+  document.getElementById("vieList").innerHTML = list.length ? list.map(vieItemHTML).join("") : `<div class="empty">Aucun événement enregistré.</div>`;
+}
+
+/* ---------------- Heures de colle ---------------- */
+function colleItemHTML(c){
+  const eleve = state.users.find(u=>u.id===c.eleveId);
+  const nom = eleve ? eleve.prenom+" "+eleve.nom : "Élève";
+  const badgeClass = c.statut==="Effectuée" ? "effectuee" : "aeffectuer";
+  return `<div class="vie-item">
+    <div class="vie-dot colle"></div>
+    <div style="flex:1">
+      <div class="desc"><b>${c.duree}h de colle</b> — ${nom} : ${c.motif}</div>
+      <div class="meta">${c.date || ""}${c.heureDebut ? " à "+c.heureDebut : ""} · donnée par ${c.surveillant || "—"}
+        <span class="statut-badge ${badgeClass}" style="margin-left:8px;">${c.statut}</span>
+        ${c.canToggle ? `<button class="btn-sm" data-toggle="${c.id}" style="margin-left:8px;">Marquer ${c.statut==="Effectuée" ? "à effectuer" : "effectuée"}</button>` : ""}
+        ${c.canDelete ? `<button class="btn-sm danger" data-del="${c.id}" style="margin-left:6px;">Supprimer</button>` : ""}
+      </div>
+    </div>
+  </div>`;
+}
+function renderColles(main, u){
+  const canAdd = u.role==="admin" || u.role==="surveillant";
+  const eleves = state.users.filter(x=>x.role==="eleve");
+  main.innerHTML = `
+    <div class="page-head">
+      <div class="eyebrow">Sanctions</div>
+      <h2>Heures de colle</h2>
+      <div class="page-sub">${u.role==="eleve" ? "Tes heures de colle" : "Suivi des heures de colle données aux élèves"}</div>
+    </div>
+    ${canAdd ? `
+    <div class="card">
+      <h3>Donner une heure de colle</h3>
+      <div class="form-row">
+        <div class="field-inline"><label>Élève</label>
+          <select id="cEleve">${eleves.length ? eleves.map(e=>`<option value="${e.id}">${e.prenom} ${e.nom} (${e.classe||""})</option>`).join("") : `<option value="">Aucun élève créé</option>`}</select>
+        </div>
+        <div class="field-inline"><label>Durée (heures)</label><input type="number" id="cDuree" min="1" step="1" value="1"></div>
+        <div class="field-inline"><label>Date</label><input type="date" id="cDate"></div>
+        <div class="field-inline"><label>Heure</label><input type="time" id="cHeure"></div>
+      </div>
+      <div class="field-inline" style="margin-bottom:14px;"><label>Motif</label><input id="cMotif" placeholder="Ex : Bavardages répétés en étude"></div>
+      <button class="btn-add" id="addColleBtn">Enregistrer</button>
+    </div>` : ""}
+    <div class="card"><div id="collesList"></div></div>
+  `;
+
+  if(canAdd){
+    document.getElementById("addColleBtn").addEventListener("click", async ()=>{
+      if(!eleves.length){ showToast("Crée d'abord un compte élève."); return; }
+      const eleveId = document.getElementById("cEleve").value;
+      const duree = document.getElementById("cDuree").value || "1";
+      const date = document.getElementById("cDate").value;
+      const heureDebut = document.getElementById("cHeure").value;
+      const motif = document.getElementById("cMotif").value.trim();
+      if(!motif){ showToast("Indique un motif."); return; }
+      state.colles.push({
+        id: uid(), eleveId, duree, date, heureDebut, motif,
+        surveillant: u.prenom+" "+u.nom, statut:"À effectuer"
+      });
+      await saveKey("pronoute:colles", state.colles);
+      showToast("Heure de colle enregistrée.");
+      renderColles(main, u);
+    });
+  }
+
+  let list = [...state.colles];
+  if(u.role==="eleve") list = list.filter(c=>c.eleveId===u.id);
+  list.sort((a,b)=> (b.date||"").localeCompare(a.date||""));
+  const canManage = u.role==="admin" || u.role==="surveillant";
+  list = list.map(c=>({ ...c, canToggle: canManage, canDelete: canManage }));
+  document.getElementById("collesList").innerHTML = list.length ? list.map(colleItemHTML).join("") : `<div class="empty">Aucune heure de colle enregistrée.</div>`;
+
+  if(canManage){
+    document.getElementById("collesList").querySelectorAll("button[data-toggle]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const c = state.colles.find(x=>x.id===btn.dataset.toggle);
+        c.statut = c.statut==="Effectuée" ? "À effectuer" : "Effectuée";
+        await saveKey("pronoute:colles", state.colles);
+        renderColles(main, u);
+      });
+    });
+    document.getElementById("collesList").querySelectorAll("button[data-del]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        state.colles = state.colles.filter(x=>x.id!==btn.dataset.del);
+        await saveKey("pronoute:colles", state.colles);
+        renderColles(main, u);
+      });
+    });
+  }
+}
+
+/* ---------------- Infirmerie ---------------- */
+function infirmerieItemHTML(rec){
+  const eleve = state.users.find(u=>u.id===rec.eleveId);
+  const nom = eleve ? eleve.prenom+" "+eleve.nom : "Élève";
+  return `<div class="vie-item">
+    <div class="vie-dot observation"></div>
+    <div>
+      <div class="desc"><b>${nom}</b> : ${rec.motif}</div>
+      <div class="meta">${rec.date || ""}${rec.heure ? " à "+rec.heure : ""} · décision : ${rec.decision} · vu par ${rec.infirmier || "—"}</div>
+    </div>
+  </div>`;
+}
+function renderInfirmerie(main, u){
+  const canAdd = u.role==="admin" || u.role==="infirmier";
+  const eleves = state.users.filter(x=>x.role==="eleve");
+  main.innerHTML = `
+    <div class="page-head">
+      <div class="eyebrow">Santé</div>
+      <h2>Infirmerie</h2>
+      <div class="page-sub">${u.role==="eleve" ? "Tes passages à l'infirmerie" : "Registre des passages à l'infirmerie"}</div>
+    </div>
+    ${canAdd ? `
+    <div class="card">
+      <h3>Enregistrer un passage</h3>
+      <div class="form-row">
+        <div class="field-inline"><label>Élève</label>
+          <select id="iEleve">${eleves.length ? eleves.map(e=>`<option value="${e.id}">${e.prenom} ${e.nom} (${e.classe||""})</option>`).join("") : `<option value="">Aucun élève créé</option>`}</select>
+        </div>
+        <div class="field-inline"><label>Date</label><input type="date" id="iDate"></div>
+        <div class="field-inline"><label>Heure</label><input type="time" id="iHeure"></div>
+        <div class="field-inline"><label>Décision</label>
+          <select id="iDecision">
+            <option>Retour en classe</option>
+            <option>Repos à l'infirmerie</option>
+            <option>Renvoyé(e) à la maison</option>
+            <option>Autre</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-inline" style="margin-bottom:14px;"><label>Motif</label><input id="iMotif" placeholder="Ex : Maux de tête"></div>
+      <button class="btn-add" id="addInfBtn">Enregistrer</button>
+    </div>` : ""}
+    <div class="card"><div id="infList"></div></div>
+  `;
+
+  if(canAdd){
+    document.getElementById("addInfBtn").addEventListener("click", async ()=>{
+      if(!eleves.length){ showToast("Crée d'abord un compte élève."); return; }
+      const eleveId = document.getElementById("iEleve").value;
+      const date = document.getElementById("iDate").value;
+      const heure = document.getElementById("iHeure").value;
+      const decision = document.getElementById("iDecision").value;
+      const motif = document.getElementById("iMotif").value.trim();
+      if(!motif){ showToast("Indique un motif."); return; }
+      state.infirmerie.push({ id: uid(), eleveId, date, heure, decision, motif, infirmier: u.prenom+" "+u.nom });
+      await saveKey("pronoute:infirmerie", state.infirmerie);
+      showToast("Passage enregistré.");
+      renderInfirmerie(main, u);
+    });
+  }
+
+  let list = [...state.infirmerie];
+  if(u.role==="eleve") list = list.filter(r=>r.eleveId===u.id);
+  list.sort((a,b)=> (b.date||"").localeCompare(a.date||""));
+  document.getElementById("infList").innerHTML = list.length ? list.map(infirmerieItemHTML).join("") : `<div class="empty">Aucun passage enregistré.</div>`;
+}
+
+/* ---------------- Boot ---------------- */
+(async function boot(){
+  render();
+  await loadAll();
+  render();
+})();
+</script>
+</body>
+</html>
